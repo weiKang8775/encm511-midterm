@@ -16,6 +16,8 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
+extern uint16_t multimeter_mode;
+extern uint8_t defaultClk;
 void IOcheck(void);
 void IOinit(void);
 

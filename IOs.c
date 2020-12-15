@@ -7,8 +7,7 @@
 
 #include "xc.h"
 #include "IOs.h"
-
-extern uint16_t multimeter_mode;
+#include "TimeDelay.h"
 
 void IOinit(void){
     TRISBbits.TRISB8 = 0; //make GPIO RB8 as a digital output
@@ -33,7 +32,9 @@ void IOinit(void){
 }
 
 void IOcheck(void){
-    
+    IEC1bits.CNIE = 0; //disable CN interrupts to avoid debounces
+    delay_ms(400,1);   // 400 msec delay to filter out debounces 
+    IEC1bits.CNIE = 1; //Enable CN interrupts to detect pb release
 
     if ((PORTAbits.RA4 == 1) && (PORTBbits.RB4 == 1) && (PORTAbits.RA2 == 0)){ //PB1(RA2) is pressed
         multimeter_mode = 1;

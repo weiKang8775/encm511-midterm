@@ -2,6 +2,7 @@
 
 #include "xc.h"
 #include "ADC.h"
+#include "IOs.h"
 #include "UART2.h"
 #include "ChangeClk.h"
 
@@ -20,7 +21,7 @@ void DisplayVoltage(void){
     Disp2Dec(voltage_reading);
     XmitUART2('V', 1);
     XmitUART2(' ', 5);
-    NewClk(32);  
+    NewClk(defaultClk);  
 }
 
 void DisplayResistance(void){
@@ -36,11 +37,21 @@ void DisplayResistance(void){
     Disp2Dec(resistance_reading);
     XmitUART2(234, 1);
     XmitUART2(' ', 5);
-    NewClk(32);  
+    NewClk(defaultClk);  
 }
 
 void DisplayPulse(void) {
+    uint16_t amplitude = Get_Amplitude();
+    float Vres = vRef / 1023;
+    float voltage_reading = amplitude * Vres;
 
+    NewClk(8);
+    XmitUART2('\r', 1);
+    Disp2String("Amplitude = ");
+    Disp2Dec(voltage_reading);
+    XmitUART2('V', 1);
+    XmitUART2(' ', 5);
+    NewClk(defaultClk);
 }
 
 void Multimeter(){
