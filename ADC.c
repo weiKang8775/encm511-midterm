@@ -13,7 +13,7 @@
 #include "IOs.h"
 #include "math.h"
 
-void ADC_Init(void) {
+void adcInit(uint8_t mode) {
     // AD1CON1 Config
     AD1CON1bits.ADON = 0;       //Turn off ADC, turn on before sampling
 	AD1CON1bits.ADSIDL = 0;     //Continue ADC operation in idle mode
@@ -37,19 +37,23 @@ void ADC_Init(void) {
     // Mux Config
     AD1CHSbits.CH0NA=0;	        //Ch0 -ve Input is VR-
 
-    if (multimeter_mode == 1) {
+    // Modes Config
+    if (mode == 1)                  // Voltage Measurement
+    {
         AD1CHSbits.CH0SA = 0b0101;  //Positive input is AN5/RA3/pin8
         TRISAbits.TRISA3 = 1;       //Set pin8/RA3/AN5 as input
         AD1PCFG = 0xFFFF;           //Set all bits as digital
         AD1PCFGbits.PCFG5=0; 	    //Set only pin8/AN5/RA3 as Analog input for ADC
     }
-    else if (multimeter_mode == 2) {
+    else if (mode == 2)             // Resistance Measurement
+    {
         AD1CHSbits.CH0SA = 0b1011;  //Positive input is pin16/RB13/AN11
         TRISBbits.TRISB13 = 1;      //Set pin16/RB13/AN11 as input
         AD1PCFG = 0xFFFF;           //Set all bits as digital
         AD1PCFGbits.PCFG11 = 0;     //Set only pin16/RB13/AN11 as Analog input for ADC
     }
-    else if (multimeter_mode == 3) {
+    else if (mode == 3)             // Amplitude Measurement
+    {
         AD1CHSbits.CH0SA = 0b1100;  //Positive input is pin15/AN12/RB12
         TRISBbits.TRISB12 = 1;      //Set pin15/AN12/RB12 as input
         AD1PCFG = 0xFFFF;           //Set all bits as digital
@@ -57,6 +61,21 @@ void ADC_Init(void) {
     }
 
     AD1CSSL = 0;                //Input Scan disabled, 0x0000 is default state.
+}
+
+uint16_t getVoltage(uint8_t mode) {
+
+    adcInit(mode);                  //Initialize ADC
+
+    uint16_t adcValue;
+
+    AD1CON1bits.ADON=1;             //Turn on ADC, ADC value stored in ADC1BUF0;
+    AD1CON1bits.SAMP=1;             //Start Sampling, Conversion starts automatically after SSRC and SAMC settings
+    while(AD1CON1bits.DONE==0) {}
+    adcValue= ADC1BUF0;             // ADC output is stored in ADC1BUF0 as this point
+    AD1CON1bits.SAMP=0;             //Stop sampling
+    AD1CON1bits.ADON=0;             //Turn off ADC, ADC value stored in ADC1BUF0;
+    return (adcValue);              //returns 10 bit ADC output stored in ADC1BIF0 to calling function
 }
 
 
@@ -93,24 +112,4 @@ uint16_t Do_ADC(uint16_t CH0SA_bits){
     AD1CON1bits.SAMP=0; //Stop sampling
     AD1CON1bits.ADON=0; //Turn off ADC, ADC value stored in ADC1BUF0;
     return (ADCvalue); //returns 10 bit ADC output stored in ADC1BIF0 to calling function
-    
-}
-
-uint16_t Get_Amplitude(void) {
-    uint8_t counter = 0;
-    uint16_t ADCvalue = 0;
-    uint16_t amplitude = 0;
-
-    while (counter++ < 100) {
-        ADC_Init();
-        AD1CON1bits.ADON = 1;       //Turn on ADC
-        AD1CON1bits.SAMP = 1;       //Start Sampling, Conversion starts automatically after SSRC and SAMC settings
-        while(AD1CON1bits.DONE==0) {}
-        ADCvalue = ADC1BUF0;        // ADC output is stored in ADC1BUF0 as this point
-        AD1CON1bits.SAMP = 0;       //Stop sampling
-        AD1CON1bits.ADON=0;         //Turn off ADC, ADC value stored in ADC1BUF0;
-        amplitude = ADCvalue > amplitude ? ADCvalue : amplitude;
-    }
-
-    return amplitude;
 }

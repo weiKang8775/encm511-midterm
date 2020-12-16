@@ -18,6 +18,7 @@ extern "C" {
 
 extern uint16_t multimeter_mode;
 extern uint8_t defaultClk;
+extern uint8_t cnFlag;
 void IOcheck(void);
 void IOinit(void);
 

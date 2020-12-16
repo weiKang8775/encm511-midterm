@@ -20,6 +20,7 @@
 
 uint8_t defaultClk = 32;
 uint16_t multimeter_mode = 0;
+uint8_t cnFlag = 0;
 
 // CLOCK CONTROL
 #pragma config IESO = OFF // 2 Speed Startup disabled
@@ -29,7 +30,6 @@ uint16_t multimeter_mode = 0;
 #pragma config POSCFREQ = MS //Primary Oscillator/External clk freq betwn
 #pragma config OSCIOFNC = ON //CLKO output disabled on pin 8, use as IO.
 #pragma config POSCMOD = NONE // Primary oscillator mode is disabled
-
 
 // MACROS for Idle, Sleep modes
 #define Nop() {__asm__ volatile ("nop");}
@@ -56,10 +56,10 @@ void main(void) {
     REFOCONbits.RODIV = 0b0011;
     REFOCONbits.ROEN = 1; // Ref oscillator is enabled 
 
-    while(1){ 
-        Multimeter();        
+    while(1)
+    {
+        Multimeter();
     }
-
     
     return;
 }

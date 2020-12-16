@@ -14,8 +14,8 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif /* __cplusplus */
-void ADC_Init(void);
+void adcInit(uint8_t mode);
+uint16_t getVoltage(uint8_t mode);
 uint16_t Do_ADC(uint16_t CH0SA_bits);
-uint16_t Get_Amplitude(void);
 #endif	/* ADC_H */
 

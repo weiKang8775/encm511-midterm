@@ -8,10 +8,13 @@
 
 #include "xc.h"
 #include "TimeDelay.h"
+#include "IOs.h"
+#include "ChangeClk.h"
 
 
 void delay_ms(uint16_t time_ms, uint8_t idle_on)
 {
+    NewClk(32);
     //T2CON config
     T2CONbits.TSIDL = 0; //operate in idle mode
     T2CONbits.T32 = 0; // operate timer 2 as 16 bit timer
@@ -32,6 +35,9 @@ void delay_ms(uint16_t time_ms, uint8_t idle_on)
         Idle(); 
     }
     T2CONbits.TON=0; // Stop timer
+
+    NewClk(defaultClk);
+    
     return;
 }
 

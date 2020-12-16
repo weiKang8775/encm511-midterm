@@ -36,23 +36,31 @@ void IOcheck(void){
     delay_ms(400,1);   // 400 msec delay to filter out debounces 
     IEC1bits.CNIE = 1; //Enable CN interrupts to detect pb release
 
-    if ((PORTAbits.RA4 == 1) && (PORTBbits.RB4 == 1) && (PORTAbits.RA2 == 0)){ //PB1(RA2) is pressed
+    if ((PORTAbits.RA4 == 1) && (PORTBbits.RB4 == 1) && (PORTAbits.RA2 == 0))       //PB1(RA2) is pressed
+    {
         multimeter_mode = 1;
     }    
-    else if ((PORTBbits.RB4 == 1) && (PORTAbits.RA4 == 0) && (PORTAbits.RA2 == 1)){ //PB2(RA4) is pressed
+    else if ((PORTBbits.RB4 == 1) && (PORTAbits.RA4 == 0) && (PORTAbits.RA2 == 1))  //PB2(RA4) is pressed
+    {
         multimeter_mode = 2;
     }  
-    else if ((PORTAbits.RA2 == 1) && (PORTAbits.RA4 == 1) && (PORTBbits.RB4 == 0)){ //PB3(RB4) is pressed
+    else if ((PORTAbits.RA2 == 1) && (PORTAbits.RA4 == 1) && (PORTBbits.RB4 == 0))  //PB3(RB4) is pressed
+    {
         multimeter_mode = 3;
     }
-    else {
+    else
+    {
         multimeter_mode = 0;
     }
 }
 
 //CN interrupt subroutine
-void __attribute__((interrupt, no_auto_psv)) _CNInterrupt(void){
+void __attribute__((interrupt, no_auto_psv)) _CNInterrupt(void)
+{
 	IFS1bits.CNIF = 0; //clear CN flag
+    T2CONbits.TON = 0; // Disable timer
+    IEC0bits.T2IE = 0; //Disable timer interrupt
+    cnFlag = 0;
     IOcheck();
     Nop();
     return;
